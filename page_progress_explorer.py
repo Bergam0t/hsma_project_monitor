@@ -1,9 +1,11 @@
 import streamlit as st
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
+from dateutil.relativedelta import relativedelta
 import pandas as pd
 from time import sleep
 from streamlit_extras.stylable_container import stylable_container
 from utils import get_gs_connection, init_supabase_connection, get_proj_register_df, get_projects_df
+import plotly.express as px
 
 # Use wide layout
 st.set_page_config(layout="wide",
@@ -44,9 +46,9 @@ if st.session_state.project != "Please Select a Project":
 else:
     st.session_state.project_code = None
 
-project_updates = st.session_state.existing_projects[st.session_state.existing_projects["project_code"] == st.session_state.project_code].sort_values("display_date", ascending=False)
+project_updates_full = st.session_state.existing_projects[st.session_state.existing_projects["project_code"] == st.session_state.project_code].sort_values("display_date", ascending=False)
 
-project_updates = project_updates[['display_date', 'entry_type', 'submitter', 'entry']].reset_index(drop=True)
+project_updates = project_updates_full[['display_date', 'entry_type', 'submitter', 'entry']].reset_index(drop=True)
 
 if st.session_state.project == "Please Select a Project":
     st.empty()
@@ -62,6 +64,49 @@ else:
                          'submitter': 'Submitter',
                          'entry': st.column_config.TextColumn(label='Entry', width="large")
                      })
+
+    st.write("""\n*Note that for now, if a user has submitted an entry via the structured log, each box will be shown as a separate submission. This will be fixed in a later version of the app.*""")
+
+    fig = px.scatter(project_updates_full, x="update_dt", y="entry_type",
+                               hover_data=["submitter","entry"],
+                               color="submitter")
+
+    fig.update_xaxes(
+        dtick="M1",
+        tickformat="%b\n%Y",
+        range = [date.today() - relativedelta(months=12), date.today() + relativedelta(months=1)]
+    )
+
+    fig.update_layout(showlegend=True,
+                  xaxis=dict(
+        rangeselector=dict(
+            buttons=list([
+                dict(count=1,
+                     label="1m",
+                     step="month",
+                     stepmode="backward"),
+                dict(count=6,
+                     label="6m",
+                     step="month",
+                     stepmode="backward"),
+                dict(count=1,
+                     label="YTD",
+                     step="year",
+                     stepmode="todate"),
+                dict(count=1,
+                     label="1y",
+                     step="year",
+                     stepmode="backward"),
+                dict(step="all")
+            ])
+        ),
+        rangeslider=dict(
+            visible=True
+        ),
+        type="date"
+    ))
+
+    st.plotly_chart(fig)
 
     text_string = ""
 
