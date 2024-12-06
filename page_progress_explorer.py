@@ -48,10 +48,10 @@ project_updates = st.session_state.existing_projects[st.session_state.existing_p
 
 project_updates = project_updates[['display_date', 'entry_type', 'submitter', 'entry']].reset_index(drop=True)
 
-if len(project_updates) == 0:
-    st.info("No Updates received for this project yet")
-elif st.session_state.project == "Please Select a Project":
+if st.session_state.project == "Please Select a Project":
     st.empty()
+elif len(project_updates) == 0:
+    st.info("No updates received for this project yet")
 else:
     with st.expander("Click here to view as a table"):
         st.dataframe(project_updates,
