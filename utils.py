@@ -31,3 +31,7 @@ def run_query_main(supabase):
 def get_projects_df(_supabase):
     st.session_state.existing_projects = pd.DataFrame(run_query_main(_supabase).data)
     st.session_state.existing_projects["display_date"] = pd.to_datetime(st.session_state.existing_projects["created_at"]).dt.strftime("%A, %B %d %Y at %H:%M")
+    st.session_state.existing_projects["update_dt"] = pd.to_datetime(st.session_state.existing_projects["created_at"])
+    today = pd.Timestamp.now(tz="UTC").ceil('D')
+    st.session_state.existing_projects['days_since_last_update'] = (today - pd.to_datetime(st.session_state.existing_projects["update_dt"])).dt.days
+    return st.session_state.existing_projects
