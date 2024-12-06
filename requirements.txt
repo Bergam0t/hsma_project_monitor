@@ -1,0 +1,12 @@
+pandas==2.2.2
+numpy==1.26.4
+simpy==4.0.2
+matplotlib==3.9.1.post1
+streamlit==1.40.2
+ipykernel==6.29.5
+ipython==8.27.0
+openpyxl
+nbformat>=4.2.0
+supabase==2.8.1
+st-gsheets-connection==0.1.0
+pyperclip==1.9.0
