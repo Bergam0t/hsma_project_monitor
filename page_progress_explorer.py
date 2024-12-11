@@ -30,6 +30,20 @@ st.title("Progress Explorer")
 get_projects_df(st.session_state.supabase)
 
 hsma_proj_reg_df = get_proj_register_df(st.session_state.gs_conn)
+
+filter_projects_with_updates = st.toggle("Filter to only projects with an update", value=False)
+
+if filter_projects_with_updates:
+    hsma_proj_reg_df = hsma_proj_reg_df[hsma_proj_reg_df["Project Code"].isin(st.session_state.existing_projects["project_code"].unique())]
+
+sorting = st.radio("Choose sort order", ["By Project Code", "By Last Updated Date (most recent first)"])
+
+most_recent_update = st.session_state.existing_projects.sort_values('created_at', ascending=False).groupby('project_code').head(1)[["project_code", "created_at"]]
+
+if sorting == "By Last Updated Date (most recent first)":
+    hsma_proj_reg_df = pd.merge(hsma_proj_reg_df, most_recent_update, left_on="Project Code", right_on="project_code", how="left")
+    hsma_proj_reg_df = hsma_proj_reg_df.sort_values("created_at", ascending=False)
+
 project_list = ["Please Select a Project"]
 project_list =  project_list + hsma_proj_reg_df['Full Project Title and Leads'].tolist()
 
