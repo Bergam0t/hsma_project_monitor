@@ -23,7 +23,7 @@ if 'gs_conn' not in st.session_state:
 if 'supabase' not in st.session_state:
     st.session_state.supabase = init_supabase_connection()
 if 'existing_projects' not in st.session_state:
-    get_projects_df(st.session_state.supabase)
+    st.session_state.existing_projects = get_projects_df(st.session_state.supabase)
 if 'project_code' not in st.session_state:
     st.session_state.project_code = 9999
 

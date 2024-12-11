@@ -19,7 +19,7 @@ if 'supabase' not in st.session_state:
 if 'project_code' not in st.session_state:
     st.session_state.project_code = 9999
 if 'existing_projects' not in st.session_state:
-    get_projects_df(st.session_state.supabase)
+    st.session_state.existing_projects = get_projects_df(st.session_state.supabase)
 
 # Import stylesheet for font and page margin setting
 with open("style.css") as css:
