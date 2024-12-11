@@ -17,7 +17,7 @@ if 'gs_conn' not in st.session_state:
 if 'supabase' not in st.session_state:
     st.session_state.supabase = init_supabase_connection()
 if 'project_code' not in st.session_state:
-    st.session_state.project_code = None
+    st.session_state.project_code = 9999
 if 'existing_projects' not in st.session_state:
     st.session_state.existing_projects = pd.DataFrame()
 
