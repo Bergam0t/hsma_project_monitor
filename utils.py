@@ -15,7 +15,7 @@ def init_supabase_connection():
     key = st.secrets["SUPABASE_KEY"]
     return create_client(url, key)
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=10)
 def get_proj_register_df(_gs_conn):
     hsma_proj_reg_df = _gs_conn.read()
     hsma_proj_reg_df = hsma_proj_reg_df.sort_values("Project Code")
@@ -27,11 +27,13 @@ def get_proj_register_df(_gs_conn):
 def run_query_main(supabase):
     return supabase.table("ProjectLogs").select("*").execute()
 
-@st.cache_data(ttl=30)
+@st.cache_data(ttl=10)
 def get_projects_df(_supabase):
-    st.session_state.existing_projects = pd.DataFrame(run_query_main(_supabase).data)
-    st.session_state.existing_projects["display_date"] = pd.to_datetime(st.session_state.existing_projects["created_at"]).dt.strftime("%A, %B %d %Y at %H:%M")
-    st.session_state.existing_projects["update_dt"] = pd.to_datetime(st.session_state.existing_projects["created_at"])
+    existing_projects = pd.DataFrame(run_query_main(_supabase).data)
+    existing_projects["display_date"] = pd.to_datetime(existing_projects["created_at"]).dt.strftime("%A, %B %d %Y at %H:%M")
+    existing_projects["update_dt"] = pd.to_datetime(existing_projects["created_at"])
     today = pd.Timestamp.now(tz="UTC").ceil('D')
-    st.session_state.existing_projects['days_since_last_update'] = (today - pd.to_datetime(st.session_state.existing_projects["update_dt"])).dt.days
-    return st.session_state.existing_projects
+    existing_projects['days_since_last_update'] = (today - pd.to_datetime(existing_projects["update_dt"])).dt.days
+
+    st.session_state.existing_projects = existing_projects
+    return existing_projects
